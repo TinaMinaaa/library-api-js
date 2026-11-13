@@ -1,44 +1,20 @@
+import "dotenv/config";
 import express from "express";
+import booksRouter from "./routes/books.router.js";
+import { logger } from "./middlewares/logger.js";
+import { notFound, errorHandler } from "./middlewares/error.js";
 
 const app = express();
-const PORT = 3000;
 
-// 1. Үндсэн route (GET /)
-app.get("/", (req, res) => {
-  res.json({
-    message: "Library API",
-    version: "1.0.0"
-  });
-});
+app.use(express.json());
+app.use(logger);
 
-// 2. Сервер ажиллаж байгаа эсэхийг шалгах стандарт route (GET /health)
-app.get("/health", (req, res) => {
-  res.status(200).json({
-    status: "ok",
-    uptime: process.uptime()
-  });
-});
+app.use("/books", booksRouter);
 
-// 3. Хэрэглэгчийн мэдээлэл авах route (GET /profile)
-// АНХААРАХ: Response-д хэзээ ч нууц үг (password) оруулахгүй!
-app.get("/profile", (req, res) => {
-  res.json({
-    name: "Bat",
-    role: "USER",
-    email: "bat@example.com"
-  });
-});
+app.use(notFound);
+app.use(errorHandler);
 
-// 4. Params ашигласан динамик route (GET /books/:id)
-app.get("/books/:id", (req, res) => {
-  const id = Number(req.params.id); // params нь үргэлж string байдаг тул тоо руу хөрвүүлнэ
-  res.json({
-    id: id,
-    title: "Node.js Basics"
-  });
-});
-
-// Бүх route-ууд app.listen()-ээс ДЭЭР бичигдсэн байх ёстой!
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server is running at http://localhost:${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
