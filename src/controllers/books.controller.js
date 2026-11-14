@@ -80,3 +80,6 @@ export function remove(req, res) {
 
   res.status(204).send();
 }
+const books = await prisma.book.findMany({
+  include: { author: true }
+});
